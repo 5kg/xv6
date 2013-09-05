@@ -183,16 +183,6 @@ clean:
 	.gdbinit \
 	$(UPROGS)
 
-# make a printout
-FILES = $(shell grep -v '^\#' runoff.list)
-PRINT = runoff.list runoff.spec README toc.hdr toc.ftr $(FILES)
-
-xv6.pdf: $(PRINT)
-	./runoff
-	ls -l xv6.pdf
-
-print: xv6.pdf
-
 # run in emulators
 
 bochs : fs.img xv6.img
