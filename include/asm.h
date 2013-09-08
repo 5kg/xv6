@@ -1,6 +1,6 @@
 //
 // assembler macros to create x86 segments
-//
+// Reference: http://www.logix.cz/michal/doc/i386/chp05-01.htm
 
 #define SEG_NULLASM                                             \
         .word 0, 0;                                             \

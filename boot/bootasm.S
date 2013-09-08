@@ -20,6 +20,9 @@ start:
 
   # Physical address line A20 is tied to zero so that the first PCs 
   # with 2 MB would run software that assumed 1 MB.  Undo that.
+  # Reference: http://www.win.tue.nl/~aeb/linux/kbd/A20.html
+  #            http://wiki.osdev.org/A20_Line
+  #            linux/arch/x86/boot/a20.c
 seta20.1:
   inb     $0x64,%al               # Wait for not busy
   testb   $0x2,%al
@@ -44,7 +47,6 @@ seta20.2:
   orl     $CR0_PE, %eax
   movl    %eax, %cr0
 
-//PAGEBREAK!
   # Complete transition to 32-bit protected mode by using long jmp
   # to reload %cs and %eip.  The segment descriptors are set up with no
   # translation, so that the mapping is still the identity mapping.
@@ -76,13 +78,22 @@ spin:
   jmp     spin
 
 # Bootstrap GDT
-.p2align 2                                # force 4 byte alignment
+.align 8                                  # force 8 byte alignment, see 3A 3.5.1
 gdt:
   SEG_NULLASM                             # null seg
   SEG_ASM(STA_X|STA_R, 0x0, 0xffffffff)   # code seg
   SEG_ASM(STA_W, 0x0, 0xffffffff)         # data seg
 
+# Format of GDTR pseudo-descriptor in IA-32 mode
+#
+# 47                    16 15         0
+# +-----+-----+-----+-----+-----+-----+
+# |   32-bit Base Address |   Limit   |
+# +-----+-----+-----+-----+-----+-----+
+#
+# Base addresses of the GDT should be aligned on an eight-byte boundary.
+# GDT limit should be one less than an integral multiple of eight (8N – 1).
+
 gdtdesc:
   .word   (gdtdesc - gdt - 1)             # sizeof(gdt) - 1
   .long   gdt                             # address gdt
-
