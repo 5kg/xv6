@@ -1,0 +1,3 @@
+boot: disk
+ata0-master: type=disk, mode=flat, path="boot.img", cylinders=512, heads=2, spt=16
+log: bochs.log
